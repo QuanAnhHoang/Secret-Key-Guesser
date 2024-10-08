@@ -16,13 +16,15 @@ public class Main {
             totalGuesses += guesses;
             minGuesses = Math.min(minGuesses, guesses);
             maxGuesses = Math.max(maxGuesses, guesses);
+            System.out.println("Run " + (i+1) + ": " + guesses + " guesses");
         }
 
         double avgGuesses = (double) totalGuesses / TEST_RUNS;
 
-        System.out.println("Performance over " + TEST_RUNS + " runs:");
+        System.out.println("\nPerformance over " + TEST_RUNS + " runs:");
         System.out.println("Average guesses: " + avgGuesses);
         System.out.println("Minimum guesses: " + minGuesses);
         System.out.println("Maximum guesses: " + maxGuesses);
+        System.out.println("Total guesses: " + totalGuesses);
     }
 }
