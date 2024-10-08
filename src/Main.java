@@ -1,5 +1,5 @@
 public class Main {
-    private static final int TEST_RUNS = 100;
+    private static final int TEST_RUNS = 3; // Reduced for demonstration
 
     public static void main(String[] args) {
         runPerformanceTests();
@@ -12,11 +12,12 @@ public class Main {
 
         for (int i = 0; i < TEST_RUNS; i++) {
             SecretKeyGuesser guesser = new SecretKeyGuesser();
-            int guesses = guesser.start();
+            guesser.start();
+            int guesses = guesser.getGuessCount();
             totalGuesses += guesses;
             minGuesses = Math.min(minGuesses, guesses);
             maxGuesses = Math.max(maxGuesses, guesses);
-            System.out.println("Run " + (i+1) + ": " + guesses + " guesses");
+            System.out.println("Run " + (i + 1) + ": " + guesses + " guesses");
         }
 
         double avgGuesses = (double) totalGuesses / TEST_RUNS;
