@@ -1,80 +1,79 @@
-/* 
-
-1st algorithm works by starting with all 'R's and systematically trying all combinations, updating positions from right to left when needed. 
-This approach ensures to find the correct key while keeping the number of guesses relatively low.
-
-2nd approach should significantly reduce the number of guesses compared to the previous implementations. It makes intelligent decisions based on the feedback from each guess, effectively narrowing down the possible combinations much faster.This approach should significantly reduce the number of guesses compared to the previous implementations. 
-It makes intelligent decisions based on the feedback from each guess, effectively narrowing down the possible combinations much faster.
-
-*/
-
 public class SecretKeyGuesser {
     private static final int KEY_LENGTH = 16;
     private static final char[] POSSIBLE_CHARS = {'R', 'M', 'I', 'T'};
     private SecretKey secretKey;
     private char[] currentGuess;
     private int guessCount;
+    private char[] knownCorrect; // Tracks known correct characters per position
 
-    public int start() {
+    public void start() {
         secretKey = new SecretKey();
         currentGuess = new char[KEY_LENGTH];
-        guessCount = 0;
-        // Initialize currentGuess with valid characters
+        knownCorrect = new char[KEY_LENGTH];
+        // Initialize currentGuess and knownCorrect with null characters
         for (int i = 0; i < KEY_LENGTH; i++) {
-            currentGuess[i] = 'R';
+            currentGuess[i] = 'R'; // Initial guess for all positions
+            knownCorrect[i] = '\0'; // '\0' denotes unknown
         }
-        solveKey(0, KEY_LENGTH - 1);
-        return guessCount;
+        guessCount = 0;
+        solveKey();
     }
 
-    private void solveKey(int start, int end) {
-        if (start > end) return;
+    private void solveKey() {
+        // Initial guess with all 'R's
+        int correctPositions = makeGuess();
         
-        int mid = (start + end) / 2;
-        char bestChar = findBestChar(start, mid);
-        
-        for (int i = start; i <= mid; i++) {
-            currentGuess[i] = bestChar;
-        }
-        
-        if (start == end) return;
-        
-        int correctBefore = makeGuess();
-        solveKey(start, mid);
-        int correctAfter = makeGuess();
-        
-        if (correctAfter > correctBefore) {
-            solveKey(mid + 1, end);
-        } else {
-            for (int i = mid + 1; i <= end; i++) {
-                currentGuess[i] = bestChar;
+        // Iterate through each position to determine the correct character
+        for (int i = 0; i < KEY_LENGTH; i++) {
+            if (correctPositions == KEY_LENGTH) {
+                break; // All positions are correct
             }
-        }
-    }
 
-    private char findBestChar(int start, int end) {
-        int[] counts = new int[POSSIBLE_CHARS.length];
-        char[] tempGuess = currentGuess.clone(); // Create a temporary array for testing
-        
-        for (int i = 0; i < POSSIBLE_CHARS.length; i++) {
-            for (int j = start; j <= end; j++) {
-                tempGuess[j] = POSSIBLE_CHARS[i];
+            char originalChar = currentGuess[i];
+            boolean found = false;
+
+            for (char c : POSSIBLE_CHARS) {
+                if (c == originalChar) {
+                    continue; // Skip the character already in this position
+                }
+
+                // Set the current position to a new character
+                currentGuess[i] = c;
+                int newCorrectPositions = makeGuess();
+
+                if (newCorrectPositions > correctPositions) {
+                    // Correct character found for this position
+                    knownCorrect[i] = c;
+                    correctPositions = newCorrectPositions;
+                    found = true;
+                    break; // Move to the next position
+                } else {
+                    // Revert the change as it didn't improve the guess
+                    currentGuess[i] = originalChar;
+                }
             }
-            counts[i] = secretKey.guess(new String(tempGuess));
-            guessCount++;
-        }
-        
-        int maxIndex = 0;
-        for (int i = 1; i < counts.length; i++) {
-            if (counts[i] > counts[maxIndex]) {
-                maxIndex = i;
+
+            if (!found) {
+                // If no improvement, the original character was correct
+                knownCorrect[i] = originalChar;
+                // No need to change currentGuess[i] as it's already the originalChar
             }
         }
-        return POSSIBLE_CHARS[maxIndex];
     }
 
     private int makeGuess() {
         guessCount++;
-        return secretKey.guess(new String(currentGuess));
+        String guessString = new String(currentGuess);
+        int result = secretKey.guess(guessString);
+        if (result == KEY_LENGTH) {
+            // Found the correct key
+            System.out.println("Secret Key Found: " + guessString);
+        }
+        return result;
+    }
+
+    // Optional: Method to retrieve the number of guesses made
+    public int getGuessCount() {
+        return guessCount;
     }
 }
