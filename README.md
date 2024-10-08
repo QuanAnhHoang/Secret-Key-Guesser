@@ -5,10 +5,10 @@
 
 # Problem Details
 
-### Important: 
+### Important
 You are not allowed to use the classes/interfaces defined in the Java Collection Framework. You can use/extend the examples/solutions I shared on our course's GitHub page. You are not allowed to use code copied from the Internet.
 
-### Background: 
+### Background
 You found a box containing THE book "How to earn HDs for every course at RMIT with only 5-minute self-learning per day". It's very very very precious, isn't it? However, to open the box you need to know a secret key that is used to unlock the box. By looking at the lock pattern, you know that the secret key contains 16 letters, each can be either "R", "M", "I" or "T". You can calculate how many combinations there are. If each try takes you one second, do you want to try? Fortunately, you have a hack that: given a guessed secret key, it returns the number of positions that are matched between the guessed key and the correct key. For example (I used only 4 letters here for demonstration purposes only), if the correct secret key is "RMIT" and you guess "MMIT", the last three positions are correct, so 3 is returned. If you guess "TRMI", zero is returned. If you guess "RRRR", 1 is returned. And if you guess "RMIT", 4 is returned. Of course, in your case, you want to have 16 returned.
 
 ### Technical Description
@@ -88,7 +88,6 @@ while (totalCorrect < KEY_LENGTH) {
         if (confirmed[pos]) {
             continue;
         }
-        // Try substituting with other possible characters
     }
     if (!progress) {
         resolveRemainingPositions();
@@ -111,7 +110,6 @@ for (char testChar : POSSIBLE_CHARS) {
     }
     currentGuess[pos] = testChar;
     int newCorrect = makeGuess();
-    // Interpret the feedback
 }
 ```
 
@@ -159,5 +157,30 @@ private void resolveRemainingPositions() {
 ### 6. Termination
 - The loop terminates when totalCorrect == KEY_LENGTH, meaning all positions have been correctly identified.
 - The secret key is then printed.
+
+## Time Complexity
+
+Let:
+- N be the length of the secret key (16 in this case).
+- C be the number of possible characters for each position (4 in this case).
+
+### Best Case
+- The secret key is composed entirely of the default character (e.g., 'R').
+- The initial guess correctly identifies all positions.
+- Total guesses: 1.
+
+### Worst Case
+- Each position takes the maximum number of tries to confirm.
+- For each position, we may need to try up to 𝐶−1 substitutions.
+
+### Approximate Calculations
+
+- Initialization Guess: 1 guess.
+
+- Iterative Refinement: For each of the N positions, in the worst case, we might need up to C−1 guesses. Total guesses in this phase: (C−1)⋅N.
+
+- Resolve Remaining Positions (Brute Force): If the progress in iterative refinement stalls, for the remaining positions, we might need to try up to C guesses each. Total guesses in this phase: up to C⋅N.
+
+#### The time complexity is O(N⋅C), as the dominant factor is the nested loops over positions and possible characters. 
 
 ***
