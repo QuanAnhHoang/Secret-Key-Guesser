@@ -1,10 +1,3 @@
-/* 
-
-The algorithm works by starting with all 'R's and systematically trying all combinations, updating positions from right to left when needed. 
-This approach ensures to find the correct key while keeping the number of guesses relatively low.
-
-*/
-
 import java.util.Random;
 
 public class SecretKey {
@@ -22,12 +15,15 @@ public class SecretKey {
     }
 
     public int guess(String guessedKey) {
+        if (guessedKey == null) {
+            throw new IllegalArgumentException("Guessed key cannot be null");
+        }
         if (guessedKey.length() != KEY_LENGTH) {
-            return -1;
+            throw new IllegalArgumentException("Guessed key must be exactly " + KEY_LENGTH + " characters long");
         }
         for (char c : guessedKey.toCharArray()) {
             if (c != 'R' && c != 'M' && c != 'I' && c != 'T') {
-                return -1;
+                throw new IllegalArgumentException("Guessed key can only contain R, M, I, or T");
             }
         }
         int correctPositions = 0;
