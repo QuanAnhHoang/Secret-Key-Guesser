@@ -1,3 +1,10 @@
+/* 
+
+The algorithm works by starting with all 'R's and systematically trying all combinations, updating positions from right to left when needed. 
+This approach ensures to find the correct key while keeping the number of guesses relatively low.
+
+*/
+
 import java.util.Random;
 
 public class SecretKey {
@@ -30,5 +37,10 @@ public class SecretKey {
             }
         }
         return correctPositions;
+    }
+
+    // Method for testing purposes
+    public String getKey() {
+        return key;
     }
 }
