@@ -1,21 +1,15 @@
-/* 
-
-The algorithm works by starting with all 'R's and systematically trying all combinations, updating positions from right to left when needed. 
-This approach ensures to find the correct key while keeping the number of guesses relatively low.
-
-*/
-
-
-
 public class SecretKeyGuesser {
     private static final int KEY_LENGTH = 16;
     private static final char[] POSSIBLE_CHARS = {'R', 'M', 'I', 'T'};
+    private static final int MAX_GUESSES = 1000000; // Prevent infinite loops
     private SecretKey secretKey;
     private char[] currentGuess;
+    private int guessCount;
 
     public void start() {
         secretKey = new SecretKey();
         currentGuess = new char[KEY_LENGTH];
+        guessCount = 0;
         initializeGuess();
         findSecretKey();
     }
@@ -29,11 +23,22 @@ public class SecretKeyGuesser {
     private void findSecretKey() {
         int correctPositions;
         do {
-            correctPositions = secretKey.guess(new String(currentGuess));
+            guessCount++;
+            String guessString = new String(currentGuess);
+            correctPositions = secretKey.guess(guessString);
+            System.out.println("Guess " + guessCount + ": " + guessString + " (Correct: " + correctPositions + ")");
+            
             if (correctPositions == KEY_LENGTH) {
-                System.out.println("Secret key found: " + new String(currentGuess));
+                System.out.println("Secret key found: " + guessString);
+                System.out.println("Total guesses: " + guessCount);
                 return;
             }
+            
+            if (guessCount >= MAX_GUESSES) {
+                System.out.println("Maximum guess limit reached. Stopping.");
+                return;
+            }
+            
             updateGuess(correctPositions);
         } while (true);
     }
