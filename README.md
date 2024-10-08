@@ -56,7 +56,8 @@ The following steps will be used to test your program:
 
 ### 1. Initialization
 
-char defaultChar = POSSIBLE_CHARS[0];
+```
+char defaultChar = POSSIBLE_CHARS;
 for (int i = 0; i < KEY_LENGTH; i++) {
     currentGuess[i] = defaultChar;
 }
@@ -67,6 +68,7 @@ int totalCorrect = makeGuess();
 
 ### 2. Iterative Refinement Loop
 
+```
 while (totalCorrect < KEY_LENGTH) {
     boolean progress = false;
     for (int pos = 0; pos < KEY_LENGTH; pos++) {
@@ -86,6 +88,7 @@ while (totalCorrect < KEY_LENGTH) {
 
 ### 3. Trying Substitutions
 
+```
 char originalChar = currentGuess[pos];
 boolean positionConfirmed = false;
 for (char testChar : POSSIBLE_CHARS) {
@@ -115,6 +118,23 @@ If newCorrect == totalCorrect:
 No new information is gained; revert the change and try the next character.
 
 ### 5. Resolving Remaining Positions
+
+```
+private void resolveRemainingPositions() {
+    for (int pos = 0; pos < KEY_LENGTH; pos++) {
+        if (confirmed[pos]) {
+            continue;
+        }
+        for (char testChar : POSSIBLE_CHARS) {
+            currentGuess[pos] = testChar;
+            int newCorrect = makeGuess();
+            if (newCorrect > guessCount) {
+                confirmed[pos] = true;
+                break;
+            }
+        }
+    }
+}
 
 - For any positions not yet confirmed, try each possible character.
 - Since no progress was made in previous iterations, we resort to brute-force checking.
