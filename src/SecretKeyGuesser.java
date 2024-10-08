@@ -19,6 +19,10 @@ public class SecretKeyGuesser {
         secretKey = new SecretKey();
         currentGuess = new char[KEY_LENGTH];
         guessCount = 0;
+        // Initialize currentGuess with valid characters
+        for (int i = 0; i < KEY_LENGTH; i++) {
+            currentGuess[i] = 'R';
+        }
         solveKey(0, KEY_LENGTH - 1);
         return guessCount;
     }
@@ -50,11 +54,14 @@ public class SecretKeyGuesser {
 
     private char findBestChar(int start, int end) {
         int[] counts = new int[POSSIBLE_CHARS.length];
+        char[] tempGuess = currentGuess.clone(); // Create a temporary array for testing
+        
         for (int i = 0; i < POSSIBLE_CHARS.length; i++) {
             for (int j = start; j <= end; j++) {
-                currentGuess[j] = POSSIBLE_CHARS[i];
+                tempGuess[j] = POSSIBLE_CHARS[i];
             }
-            counts[i] = makeGuess();
+            counts[i] = secretKey.guess(new String(tempGuess));
+            guessCount++;
         }
         
         int maxIndex = 0;
