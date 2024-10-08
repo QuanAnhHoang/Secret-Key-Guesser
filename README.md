@@ -171,7 +171,7 @@ Let:
 
 ### Worst Case
 - Each position takes the maximum number of tries to confirm.
-- For each position, we may need to try up to 𝐶−1 substitutions.
+- For each position, we may need to try up to C-1 substitutions.
 
 ### Approximate Calculations
 
@@ -182,5 +182,13 @@ Let:
 - Resolve Remaining Positions (Brute Force): If the progress in iterative refinement stalls, for the remaining positions, we might need to try up to C guesses each. Total guesses in this phase: up to C⋅N.
 
 #### The time complexity is O(N⋅C), as the dominant factor is the nested loops over positions and possible characters. 
+
+## Evaluation
+
+| Feature             | Description                                                                                                   |
+|----------------------|---------------------------------------------------------------------------------------------------------------|
+| Multiple Test Runs | The `Main` class executes the `SecretKeyGuesser` algorithm multiple times (default is 3) with varying secret keys. |
+| Verification       | After each run, the discovered secret key is displayed, allowing comparison with the actual secret key (obtained via `secretKey.getKey()`). |
+| Exception Handling  | The system gracefully handles invalid inputs, catching and managing exceptions thrown by the `SecretKey` class (e.g., due to incorrect guesses). |
 
 ***
