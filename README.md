@@ -62,6 +62,7 @@ for (int i = 0; i < KEY_LENGTH; i++) {
     currentGuess[i] = defaultChar;
 }
 int totalCorrect = makeGuess();
+```
 
 - All positions are initially set to 'R' (or the first character in POSSIBLE_CHARS).
 - An initial guess is made, and the number of correct positions is stored in totalCorrect.
@@ -82,6 +83,7 @@ while (totalCorrect < KEY_LENGTH) {
         break;
     }
 }
+```
 
 - The loop continues until all positions are confirmed (totalCorrect == KEY_LENGTH).
 - Within the loop, we attempt to make progress by refining the guess.
@@ -99,6 +101,7 @@ for (char testChar : POSSIBLE_CHARS) {
     int newCorrect = makeGuess();
     // Interpret the feedback
 }
+```
 
 - For each possible character (excluding the original character), we substitute it at the current position and make a new guess.
 - The feedback (newCorrect) is compared to totalCorrect to determine the next steps.
@@ -135,6 +138,7 @@ private void resolveRemainingPositions() {
         }
     }
 }
+```
 
 - For any positions not yet confirmed, try each possible character.
 - Since no progress was made in previous iterations, we resort to brute-force checking.
@@ -143,9 +147,5 @@ private void resolveRemainingPositions() {
 ### 6. Termination
 - The loop terminates when totalCorrect == KEY_LENGTH, meaning all positions have been correctly identified.
 - The secret key is then printed.
-
-## Personal Contributions
-
-
 
 ***
