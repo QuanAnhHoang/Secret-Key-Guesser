@@ -16,15 +16,19 @@ public class SecretKeyGuesser {
     private int guessCount;
     private int[] charFrequency;
 
-    public void start() {
+    /**
+     * Starts the process of guessing the secret key.
+     * @return The number of guesses made to find the secret key.
+     */
+    public int start() {
         secretKey = new SecretKey();
         currentGuess = new char[KEY_LENGTH];
         charFrequency = new int[POSSIBLE_CHARS.length];
         guessCount = 0;
-        findSecretKey();
+        return findSecretKey();
     }
 
-    private void findSecretKey() {
+    private int findSecretKey() {
         int correctPositions;
         do {
             guessCount++;
@@ -36,12 +40,12 @@ public class SecretKeyGuesser {
             if (correctPositions == KEY_LENGTH) {
                 System.out.println("Secret key found: " + guessString);
                 System.out.println("Total guesses: " + guessCount);
-                return;
+                return guessCount;
             }
             
             if (guessCount >= MAX_GUESSES) {
                 System.out.println("Maximum guess limit reached. Stopping.");
-                return;
+                return guessCount;
             }
             
             updateCharFrequency(correctPositions);
