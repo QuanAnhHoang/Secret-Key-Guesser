@@ -1,10 +1,13 @@
 public class Main {
-    private static final int TEST_RUNS = 3; // Reduced for demonstration
+    private static final int TEST_RUNS = 3;
 
     public static void main(String[] args) {
         runPerformanceTests();
     }
 
+    /**
+     * Runs multiple test cases to evaluate the performance of the SecretKeyGuesser.
+     */
     private static void runPerformanceTests() {
         int totalGuesses = 0;
         int minGuesses = Integer.MAX_VALUE;
