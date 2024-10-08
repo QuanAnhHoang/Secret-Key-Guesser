@@ -5,9 +5,11 @@
 
 # Problem Details
 
-### Important: You are not allowed to use the classes/interfaces defined in the Java Collection Framework. You can use/extend the examples/solutions I shared on our course's GitHub page. You are not allowed to use code copied from the Internet.
+### Important: 
+You are not allowed to use the classes/interfaces defined in the Java Collection Framework. You can use/extend the examples/solutions I shared on our course's GitHub page. You are not allowed to use code copied from the Internet.
 
-### Background: You found a box containing THE book "How to earn HDs for every course at RMIT with only 5-minute self-learning per day". It's very very very precious, isn't it? However, to open the box you need to know a secret key that is used to unlock the box. By looking at the lock pattern, you know that the secret key contains 16 letters, each can be either "R", "M", "I" or "T". You can calculate how many combinations there are. If each try takes you one second, do you want to try? Fortunately, you have a hack that: given a guessed secret key, it returns the number of positions that are matched between the guessed key and the correct key. For example (I used only 4 letters here for demonstration purposes only), if the correct secret key is "RMIT" and you guess "MMIT", the last three positions are correct, so 3 is returned. If you guess "TRMI", zero is returned. If you guess "RRRR", 1 is returned. And if you guess "RMIT", 4 is returned. Of course, in your case, you want to have 16 returned.
+### Background: 
+You found a box containing THE book "How to earn HDs for every course at RMIT with only 5-minute self-learning per day". It's very very very precious, isn't it? However, to open the box you need to know a secret key that is used to unlock the box. By looking at the lock pattern, you know that the secret key contains 16 letters, each can be either "R", "M", "I" or "T". You can calculate how many combinations there are. If each try takes you one second, do you want to try? Fortunately, you have a hack that: given a guessed secret key, it returns the number of positions that are matched between the guessed key and the correct key. For example (I used only 4 letters here for demonstration purposes only), if the correct secret key is "RMIT" and you guess "MMIT", the last three positions are correct, so 3 is returned. If you guess "TRMI", zero is returned. If you guess "RRRR", 1 is returned. And if you guess "RMIT", 4 is returned. Of course, in your case, you want to have 16 returned.
 
 ### Technical Description
 The correct secret key contains exactly 16 letters, each of which must be either "R", "M", "I", or "T". It is managed by a class SecretKey (which I will describe later).
