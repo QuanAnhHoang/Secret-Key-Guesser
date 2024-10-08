@@ -3,8 +3,6 @@
 1st algorithm works by starting with all 'R's and systematically trying all combinations, updating positions from right to left when needed. 
 This approach ensures to find the correct key while keeping the number of guesses relatively low.
 
-2nd algorithm uses a frequency-based approach to make more informed guesses, potentially reducing the number of guesses needed.
-
 */
 
 public class SecretKeyGuesser {
@@ -14,25 +12,25 @@ public class SecretKeyGuesser {
     private SecretKey secretKey;
     private char[] currentGuess;
     private int guessCount;
-    private int[] charFrequency;
 
-    /**
-     * Starts the process of guessing the secret key.
-     * @return The number of guesses made to find the secret key.
-     */
     public int start() {
         secretKey = new SecretKey();
         currentGuess = new char[KEY_LENGTH];
-        charFrequency = new int[POSSIBLE_CHARS.length];
         guessCount = 0;
+        initializeGuess();
         return findSecretKey();
+    }
+
+    private void initializeGuess() {
+        for (int i = 0; i < KEY_LENGTH; i++) {
+            currentGuess[i] = POSSIBLE_CHARS[0];
+        }
     }
 
     private int findSecretKey() {
         int correctPositions;
         do {
             guessCount++;
-            generateGuess();
             String guessString = new String(currentGuess);
             correctPositions = secretKey.guess(guessString);
             System.out.println("Guess " + guessCount + ": " + guessString + " (Correct: " + correctPositions + ")");
@@ -48,39 +46,26 @@ public class SecretKeyGuesser {
                 return guessCount;
             }
             
-            updateCharFrequency(correctPositions);
+            updateGuess(correctPositions);
         } while (true);
     }
 
-    private void generateGuess() {
-        for (int i = 0; i < KEY_LENGTH; i++) {
-            currentGuess[i] = POSSIBLE_CHARS[getMostLikelyCharIndex()];
-        }
-    }
-
-    private void updateCharFrequency(int correctPositions) {
-        for (int i = 0; i < POSSIBLE_CHARS.length; i++) {
-            if (charFrequency[i] == 0) continue;
-            charFrequency[i] = (charFrequency[i] * correctPositions) / KEY_LENGTH;
-        }
-        int totalFreq = 0;
-        for (int freq : charFrequency) totalFreq += freq;
-        if (totalFreq == 0) {
-            for (int i = 0; i < POSSIBLE_CHARS.length; i++) {
-                charFrequency[i] = 1;
+    private void updateGuess(int correctPositions) {
+        for (int i = correctPositions; i < KEY_LENGTH; i++) {
+            int currentCharIndex = getCharIndex(currentGuess[i]);
+            currentGuess[i] = POSSIBLE_CHARS[(currentCharIndex + 1) % POSSIBLE_CHARS.length];
+            if (currentCharIndex < POSSIBLE_CHARS.length - 1) {
+                break;
             }
         }
     }
 
-    private int getMostLikelyCharIndex() {
-        int maxFreq = -1;
-        int maxIndex = 0;
+    private int getCharIndex(char c) {
         for (int i = 0; i < POSSIBLE_CHARS.length; i++) {
-            if (charFrequency[i] > maxFreq) {
-                maxFreq = charFrequency[i];
-                maxIndex = i;
+            if (POSSIBLE_CHARS[i] == c) {
+                return i;
             }
         }
-        return maxIndex;
+        return -1;
     }
 }
