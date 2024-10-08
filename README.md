@@ -16,7 +16,9 @@ The correct secret key contains exactly 16 letters, each of which must be either
 
 You need to create a class SecretKeyGuesser. The class contains one required public method (you can add more private methods/attributes as needed):
 
+```
 void start()
+```
 
 In this start() method, your code must:
 
@@ -38,6 +40,14 @@ The following steps will be used to test your program:
 ***
 
 # Technical Aspects
+
+## Project Structure
+
+    Secret-Key-Guess/
+    └── src/
+        ├── Main.java
+        ├── SecretKey.java
+        └── SecretKeyGuesser.java
 
 ## Java Classes and Their Relationships
 
