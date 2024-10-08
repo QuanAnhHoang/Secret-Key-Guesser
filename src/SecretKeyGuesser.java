@@ -1,34 +1,17 @@
-/*
+/* 
 
-1. Per-Position Tracking (knownCorrect Array): The knownCorrect array keeps track of which characters have been correctly identified for each position. 
-A null character ('\0') indicates that the correct character for that position is still unknown.
+1. Handling Decrease in totalCorrect:
+- If changing a character at a position results in a decrease in totalCorrect, we conclude that the original character was correct, mark the position as confirmed, and revert the change.
 
-2. Initialization: The currentGuess is initialized with all 'R' characters, serving as the baseline for initial guesses. 
-The knownCorrect array is initialized with null characters to indicate that no positions have been confirmed yet.
+2. Loop Adjustments:
+- Introduced a while loop that continues until all positions are confirmed (i.e., totalCorrect == KEY_LENGTH).
+- The progress variable tracks whether we made any progress in an iteration. If no progress is made, we attempt to resolve remaining positions with the resolveRemainingPositions() method.
 
-3. Guess Evaluation: The initial guess is made with all 'R' characters. The number of correct positions (correctPositions) is recorded based on the response from secretKey.guess().
+3. Resolving Remaining Positions:
+- The resolveRemainingPositions() method attempts to assign possible characters to unconfirmed positions by trying all options. This is a brute-force step to handle any remaining uncertainties.
 
-4. Iterative Refinement: For each position, if not all positions are correct, the algorithm attempts to find the correct character by iterating through the possible characters ('R', 'M', 'I', 'T'), excluding the current character.
-After changing a character at position i, it makes a new guess and compares the new number of correct positions.
+*/
 
-5. If an improvement is detected (newCorrectPositions > correctPositions):
-The new character is confirmed as correct for that position.
-The knownCorrect array is updated, and the algorithm proceeds to the next position.
-
-6. If no improvement:
-The change is reverted, and the algorithm tries the next character.
-
-7.If no change improves the guess:
-The original character is considered correct for that position.
-Termination and Display:
-
-8. If the number of correct positions reaches the key length (16), the algorithm stops and displays the correct secret key.
-The makeGuess() method handles the display upon successfully finding the key.
-
-9. Guess Count Tracking: The guessCount variable accurately tracks the number of guesses made during the process.
-An optional getGuessCount() method is included to retrieve the number of guesses if needed externally.
- 
- */
 
 
 public class SecretKeyGuesser {
@@ -37,76 +20,132 @@ public class SecretKeyGuesser {
     private SecretKey secretKey;
     private char[] currentGuess;
     private int guessCount;
-    private char[] knownCorrect; // Tracks known correct characters per position
-
+    private boolean[] confirmed;    // Tracks confirmed positions
+    
+    /**
+     * Starts the guessing process to determine the secret key.
+     */
     public void start() {
         secretKey = new SecretKey();
         currentGuess = new char[KEY_LENGTH];
-        knownCorrect = new char[KEY_LENGTH];
-        // Initialize currentGuess and knownCorrect with null characters
-        for (int i = 0; i < KEY_LENGTH; i++) {
-            currentGuess[i] = 'R'; // Initial guess for all positions
-            knownCorrect[i] = '\0'; // '\0' denotes unknown
-        }
+        confirmed = new boolean[KEY_LENGTH];
         guessCount = 0;
-        solveKey();
-    }
-
-    private void solveKey() {
-        // Initial guess with all 'R's
-        int correctPositions = makeGuess();
-        
-        // Iterate through each position to determine the correct character
+    
+        // Initialize currentGuess with the first possible character
+        char defaultChar = POSSIBLE_CHARS[0];
         for (int i = 0; i < KEY_LENGTH; i++) {
-            if (correctPositions == KEY_LENGTH) {
-                break; // All positions are correct
-            }
-
-            char originalChar = currentGuess[i];
-            boolean found = false;
-
-            for (char c : POSSIBLE_CHARS) {
-                if (c == originalChar) {
-                    continue; // Skip the character already in this position
+            currentGuess[i] = defaultChar;
+        }
+    
+        // Make an initial guess
+        int totalCorrect = makeGuess();
+    
+        // Iteratively refine the guess
+        while (totalCorrect < KEY_LENGTH) {
+            boolean progress = false;
+            for (int pos = 0; pos < KEY_LENGTH; pos++) {
+                if (confirmed[pos]) {
+                    continue;
                 }
-
-                // Set the current position to a new character
-                currentGuess[i] = c;
-                int newCorrectPositions = makeGuess();
-
-                if (newCorrectPositions > correctPositions) {
-                    // Correct character found for this position
-                    knownCorrect[i] = c;
-                    correctPositions = newCorrectPositions;
-                    found = true;
-                    break; // Move to the next position
-                } else {
-                    // Revert the change as it didn't improve the guess
-                    currentGuess[i] = originalChar;
+    
+                char originalChar = currentGuess[pos];
+                boolean positionConfirmed = false;
+                for (char testChar : POSSIBLE_CHARS) {
+                    if (testChar == originalChar) {
+                        continue;
+                    }
+                    currentGuess[pos] = testChar;
+                    int newCorrect = makeGuess();
+                    if (newCorrect > totalCorrect) {
+                        // Found a correct character at this position
+                        totalCorrect = newCorrect;
+                        originalChar = testChar;
+                        progress = true;
+                        break;
+                    } else if (newCorrect < totalCorrect) {
+                        // Original character is correct at this position
+                        currentGuess[pos] = originalChar; // Revert change
+                        confirmed[pos] = true;
+                        progress = true;
+                        positionConfirmed = true;
+                        break;
+                    } else {
+                        // No change in totalCorrect, revert and try next character
+                        currentGuess[pos] = originalChar;
+                    }
+                }
+                if (!positionConfirmed && !progress) {
+                    // Cannot conclude for this position yet
+                    continue;
+                }
+                if (totalCorrect == KEY_LENGTH) {
+                    break;
                 }
             }
-
-            if (!found) {
-                // If no improvement, the original character was correct
-                knownCorrect[i] = originalChar;
-                // No need to change currentGuess[i] as it's already the originalChar
+            if (!progress) {
+                // No progress made in this iteration, need to resolve remaining positions
+                resolveRemainingPositions();
+                break;
             }
         }
+    
+        if (totalCorrect == KEY_LENGTH) {
+            System.out.println("Secret Key Found: " + new String(currentGuess));
+        } else {
+            // All positions should be confirmed at this point
+            System.out.println("Secret Key Found (after resolving): " + new String(currentGuess));
+        }
     }
-
+    
+    /**
+     * Makes a guess by submitting the current guess to the SecretKey instance.
+     * Increments the guess count and processes the result.
+     *
+     * @return The number of correct positions returned by the SecretKey.
+     */
     private int makeGuess() {
         guessCount++;
         String guessString = new String(currentGuess);
-        int result = secretKey.guess(guessString);
-        if (result == KEY_LENGTH) {
-            // Found the correct key
-            System.out.println("Secret Key Found: " + guessString);
+        int result;
+    
+        try {
+            result = secretKey.guess(guessString);
+        } catch (IllegalArgumentException e) {
+            // Handle invalid guesses gracefully
+            System.out.println("Invalid guess: " + e.getMessage());
+            result = -1;
         }
+    
         return result;
     }
-
-    // Optional: Method to retrieve the number of guesses made
+    
+    /**
+     * Retrieves the number of guesses made.
+     *
+     * @return The guess count.
+     */
     public int getGuessCount() {
         return guessCount;
+    }
+    
+    /**
+     * Resolves any remaining unconfirmed positions.
+     * This method is called when no progress can be made by direct substitution.
+     */
+    private void resolveRemainingPositions() {
+        // Collect possible characters for each unconfirmed position
+        for (int pos = 0; pos < KEY_LENGTH; pos++) {
+            if (confirmed[pos]) {
+                continue;
+            }
+            for (char testChar : POSSIBLE_CHARS) {
+                currentGuess[pos] = testChar;
+                int newCorrect = makeGuess();
+                if (newCorrect > guessCount) {
+                    confirmed[pos] = true;
+                    break;
+                }
+            }
+        }
     }
 }
